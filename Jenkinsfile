@@ -14,10 +14,11 @@ pipeline {
                 git 'https://github.com/YK-UK/game-of-life-test.git'
 
                 // Run Maven on a Unix agent.
-                sh 'mvn -Dmaven.test.failure.ignore=true clean package'
+                sh 'mvn -Dmaven.test.failure.ignore=true clean install'
 
                 // To run Maven on a Windows agent, use
                 // bat "mvn -Dmaven.test.failure.ignore=true clean package"
+                sh 'mvn javadoc:javadoc'
             }
 
             post {
@@ -26,8 +27,10 @@ pipeline {
                 success {
                     //junit 'build/reports/**/*.xml'
                     //junit '**/reports/junit/*.xml'
-                    junit '**/target/surefire-reports/TEST-*.xml'
-                    //archiveArtifacts 'target/*.jar'
+                    junit '**/target/surefire-reports/*.xml'
+                    archiveArtifacts '**/target/*.jar'
+                    javadoc javadocDir: 'gameoflife-core/target/site/apidocs', keepAll: false
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '', reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: '', useWrapperFileDirectly: true])
                 }
             }
         }
